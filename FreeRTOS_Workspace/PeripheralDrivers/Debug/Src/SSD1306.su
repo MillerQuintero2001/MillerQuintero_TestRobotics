@@ -1,0 +1,9 @@
+../Src/SSD1306.c:23:9:ssd1306WriteCommand	16	static
+../Src/SSD1306.c:30:9:ssd1306Init	24	static
+../Src/SSD1306.c:112:6:ssd1306Fill	24	static
+../Src/SSD1306.c:126:6:ssd1306UpdateScreen	56	static
+../Src/SSD1306.c:152:6:ssd1306DrawPixel	16	static
+../Src/SSD1306.c:182:6:ssd1306WriteChar	48	static
+../Src/SSD1306.c:220:6:ssd1306WriteString	24	static,ignoring_inline_asm
+../Src/SSD1306.c:245:6:ssd1306InvertColors	4	static
+../Src/SSD1306.c:251:6:ssd1306SetCursor	16	static

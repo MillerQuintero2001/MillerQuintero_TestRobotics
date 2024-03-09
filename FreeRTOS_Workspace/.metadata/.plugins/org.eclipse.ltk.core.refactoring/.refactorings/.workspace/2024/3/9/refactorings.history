@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;Ejemplo LED/Base_FreeRTOS.launch&apos;" deleteContents="false" description="Delete resource &apos;Ejemplo LED/Base_FreeRTOS.launch&apos;" element1="/Ejemplo LED/Base_FreeRTOS.launch" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1709306289609"/>&#x0A;<refactoring comment="Delete resource &apos;Ejemplo LED/Debug&apos;" deleteContents="false" description="Delete resource &apos;Ejemplo LED/Debug&apos;" element1="/Ejemplo LED/Debug" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1709306323426"/>
+</session>

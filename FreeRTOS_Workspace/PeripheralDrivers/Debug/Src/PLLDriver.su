@@ -1,0 +1,3 @@
+../Src/PLLDriver.c:17:6:configPLL	16	static,ignoring_inline_asm
+../Src/PLLDriver.c:123:10:getConfigPLL	24	static
+../Src/PLLDriver.c:142:6:changeMCO1	16	static

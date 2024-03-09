@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete 9 resources" deleteContents="false" description="Delete 9 resources" element1="/Base_FreeRTOS/ThirdParty/FreeRTOS/include" element2="/Base_FreeRTOS/ThirdParty/FreeRTOS/portable" element3="/Base_FreeRTOS/ThirdParty/FreeRTOS/croutine.c" element4="/Base_FreeRTOS/ThirdParty/FreeRTOS/event_groups.c" element5="/Base_FreeRTOS/ThirdParty/FreeRTOS/list.c" element6="/Base_FreeRTOS/ThirdParty/FreeRTOS/queue.c" element7="/Base_FreeRTOS/ThirdParty/FreeRTOS/stream_buffer.c" element8="/Base_FreeRTOS/ThirdParty/FreeRTOS/tasks.c" element9="/Base_FreeRTOS/ThirdParty/FreeRTOS/timers.c" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="9" stamp="1708702806226"/>
+</session>

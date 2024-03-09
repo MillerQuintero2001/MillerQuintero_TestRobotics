@@ -1,0 +1,8 @@
+../Src/LcdDriver.c:15:6:initLCD	16	static
+../Src/LcdDriver.c:46:6:sendCommandLCD	32	static
+../Src/LcdDriver.c:70:6:writeCommandLCD	16	static
+../Src/LcdDriver.c:86:6:sendCharLCD	32	static
+../Src/LcdDriver.c:106:6:sendStringLCD	16	static
+../Src/LcdDriver.c:115:6:moveCursorLCD	24	static
+../Src/LcdDriver.c:218:6:clearLCD	16	static
+../Src/LcdDriver.c:224:6:clearLineLCD	88	static

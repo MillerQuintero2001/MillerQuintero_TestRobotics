@@ -1,0 +1,4 @@
+../Src/RtcDriver.c:15:6:configRTC	16	static,ignoring_inline_asm
+../Src/RtcDriver.c:121:6:readCalendar	24	static
+../Src/RtcDriver.c:133:9:conversionBCDtoDEC	16	static
+../Src/RtcDriver.c:138:9:conversionDECtoBCD	16	static
