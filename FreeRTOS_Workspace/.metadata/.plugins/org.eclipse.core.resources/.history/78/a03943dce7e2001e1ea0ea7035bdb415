@@ -23,7 +23,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "GPIOxDriver.h"
-#include "PLLDriver.h"
 
 
 #define STACK_SIZE 200
@@ -46,8 +45,6 @@ int main(void)
 
 	/* Activamos del contador de Ticks */
 	DWT->CTRL    |= (1 << 0);
-
-	configPLL(100);
 
 	/* Necesario para el SEGGER*/
 	vInitPrioGroupValue();

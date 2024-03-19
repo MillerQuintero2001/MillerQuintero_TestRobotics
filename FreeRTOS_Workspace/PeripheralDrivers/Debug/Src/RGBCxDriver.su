@@ -1,4 +1,0 @@
-../Src/RGBCxDriver.c:14:6:initSensorRGB	16	static
-../Src/RGBCxDriver.c:63:6:setIntegrationTime	24	static
-../Src/RGBCxDriver.c:76:6:setGain	16	static
-../Src/RGBCxDriver.c:103:6:waitConfig	32	static,ignoring_inline_asm

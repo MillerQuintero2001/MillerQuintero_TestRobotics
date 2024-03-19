@@ -22,14 +22,12 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "GPIOxDriver.h"
-#include "PLLDriver.h"
 
 
 #define STACK_SIZE 200
 
 /* Función que inicializa el USART2 para el Segger */
-extern void SEGGER_UART_init(uint32_t);
+extern void SEGGER_UART_init(unit32_t);
 
 /* Definición de variables del sistema */
 uint32_t SystemCoreClock = 16000000;
@@ -47,8 +45,6 @@ int main(void)
 	/* Activamos del contador de Ticks */
 	DWT->CTRL    |= (1 << 0);
 
-	configPLL(100);
-
 	/* Necesario para el SEGGER*/
 	vInitPrioGroupValue();
 
@@ -58,7 +54,7 @@ int main(void)
 	/* Primero configuramos */
 	SEGGER_SYSVIEW_Conf();
 	/* Despues activamos el sistema */
-	//SEGGER_SYSVIEW_Start();
+	SEGGER_SYSVIEW_Start();
 
 	BaseType_t xReturned;
 	TaskHandle_t xHandleTask1 = NULL;

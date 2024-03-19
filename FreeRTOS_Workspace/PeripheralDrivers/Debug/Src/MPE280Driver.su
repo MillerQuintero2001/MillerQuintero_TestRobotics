@@ -1,3 +1,0 @@
-../Src/MPE280Driver.c:19:6:mpe280_readData	40	static
-../Src/MPE280Driver.c:37:6:mpe280_writeData	48	static
-../Src/MPE280Driver.c:58:6:mpe280_init	24	static

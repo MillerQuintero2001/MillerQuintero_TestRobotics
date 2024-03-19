@@ -1,9 +1,0 @@
-../Src/PwmDriver.c:13:6:pwm_Config	16	static,ignoring_inline_asm
-../Src/PwmDriver.c:127:6:startPwmSignal	16	static
-../Src/PwmDriver.c:132:6:stopPwmSignal	16	static
-../Src/PwmDriver.c:137:6:enableOutput	16	static,ignoring_inline_asm
-../Src/PwmDriver.c:166:6:disableOutput	16	static,ignoring_inline_asm
-../Src/PwmDriver.c:200:6:setPeriod	16	static
-../Src/PwmDriver.c:213:6:updatePeriod	16	static
-../Src/PwmDriver.c:222:6:setDuttyCycle	16	static
-../Src/PwmDriver.c:252:6:updateDuttyCycle	16	static
