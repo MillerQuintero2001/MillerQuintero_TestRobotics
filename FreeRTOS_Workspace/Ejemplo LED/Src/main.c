@@ -25,6 +25,7 @@
 
 #include "GPIOxDriver.h"
 #include "BasicTimer.h"
+#include "PLLDriver.h"
 
 #define STACK_SIZE 200
 
@@ -96,6 +97,7 @@ int main(void)
 
 /** Función que inicia todo el sistema*/
 void initSystem(void){
+	configPLL(100);
 
 	/* GPIO y Timer del Blinky Led de Estado PA5 */
 	handlerBlinkyPin.pGPIOx								= GPIOA;
@@ -115,15 +117,6 @@ void initSystem(void){
 	// Cargo la configuración
 	GPIO_Config(&handlerButton);
 
-
-//	// Atributos para el Timer 4 del LED de estado
-//	handlerBlinkyTimer.ptrTIMx								= TIM4;
-//	handlerBlinkyTimer.TIMx_Config.TIMx_mode				= BTIMER_MODE_UP;
-//	handlerBlinkyTimer.TIMx_Config.TIMx_speed				= BTIMER_SPEED_100us;
-//	handlerBlinkyTimer.TIMx_Config.TIMx_period				= 2500;
-//	handlerBlinkyTimer.TIMx_Config.TIMx_interruptEnable 	= BTIMER_INTERRUP_ENABLE;
-//	BasicTimer_Config(&handlerBlinkyTimer);
-//	// Fin del GPIO y Timer del LED de estado
 }
 
 /** Función que gobierna la tarea 1 */
@@ -178,7 +171,4 @@ void vTaskTwo( void * pvParameters )
     }
 }
 
-///* Interrupción del timer blinky LED */
-//void BasicTimer4_Callback(void){
-//	GPIOxTooglePin(&handlerBlinkyPin);	//Cambio el estado del LED PA5
-//}
+

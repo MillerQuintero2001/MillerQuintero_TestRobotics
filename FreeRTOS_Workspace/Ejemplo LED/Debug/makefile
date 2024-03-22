@@ -67,7 +67,7 @@ main-build: Ejemplo\ LED.elf secondary-outputs
 
 # Tool invocations
 Ejemplo\ LED.elf Ejemplo\ LED.map: $(OBJS) $(USER_OBJS) /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/Ejemplo\ LED/STM32F411RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Ejemplo LED.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/Ejemplo LED/STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Ejemplo LED.map" -Wl,--gc-sections -static -L/home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "Ejemplo LED.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/Ejemplo LED/STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Ejemplo LED.map" -Wl,--gc-sections -static -L"/home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/PeripheralDrivers/Debug" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

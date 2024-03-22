@@ -1,16 +1,16 @@
-00:51:02 **** Incremental Build of configuration Debug for project Base_FreeRTOS ****
+09:43:25 **** Incremental Build of configuration Debug for project Base_FreeRTOS ****
 make -j8 all 
-arm-none-eabi-gcc -o "Base_FreeRTOS.elf" @"objects.list"  -lPeripheralDrivers -mcpu=cortex-m4 -T"/home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/Base_FreeRTOS/STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Base_FreeRTOS.map" -Wl,--gc-sections -static -L/home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+arm-none-eabi-gcc -o "Base_FreeRTOS.elf" @"objects.list"  -lPeripheralDrivers -mcpu=cortex-m4 -T"/home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/Base_FreeRTOS/STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Base_FreeRTOS.map" -Wl,--gc-sections -static -L"/home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/PeripheralDrivers/Debug" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: Base_FreeRTOS.elf
  
 arm-none-eabi-size   Base_FreeRTOS.elf 
 arm-none-eabi-objdump -h -S  Base_FreeRTOS.elf  > "Base_FreeRTOS.list"
    text	   data	    bss	    dec	    hex	filename
-  22300	    128	  84568	 106996	  1a1f4	Base_FreeRTOS.elf
+  42628	    496	  84568	 127692	  1f2cc	Base_FreeRTOS.elf
 Finished building: default.size.stdout
  
 Finished building: Base_FreeRTOS.list
  
 
-00:51:04 Build Finished. 0 errors, 0 warnings. (took 1s.827ms)
+09:43:28 Build Finished. 0 errors, 0 warnings. (took 2s.915ms)
 

@@ -4,4 +4,14 @@
 	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration">
 	</section>
+	<section name="CResourceRenameRefactoringInputPage">
+		<item key="updateReferences" value="true"/>
+	</section>
+	<section name="org.eclipse.cdt.ui.OPEN_ACTION_SELECTION_DIALOG_SECTION">
+		<item key="DIALOG_X_ORIGIN" value="499"/>
+		<item key="DIALOG_Y_ORIGIN" value="150"/>
+		<item key="DIALOG_WIDTH" value="1113"/>
+		<item key="DIALOG_HEIGHT" value="604"/>
+		<item key="DIALOG_FONT_NAME" value="1|Noto Sans|12.0|0|GTK|1|"/>
+	</section>
 </section>
