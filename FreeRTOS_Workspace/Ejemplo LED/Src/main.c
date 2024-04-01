@@ -97,7 +97,7 @@ int main(void)
 
 /** Función que inicia todo el sistema*/
 void initSystem(void){
-	configPLL(100);
+	//configPLL(100);
 
 	/* GPIO y Timer del Blinky Led de Estado PA5 */
 	handlerBlinkyPin.pGPIOx								= GPIOA;
