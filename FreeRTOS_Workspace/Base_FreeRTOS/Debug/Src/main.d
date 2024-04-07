@@ -23,8 +23,8 @@ Src/main.o: ../Src/main.c \
  /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/STM32Cube_FW_F4_V1.27.0/Drivers/CMSIS/Core/Include/cmsis_gcc.h \
  /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/STM32Cube_FW_F4_V1.27.0/Drivers/CMSIS/Core/Include/mpu_armv7.h \
  /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/STM32Cube_FW_F4_V1.27.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h \
- /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/PeripheralDrivers/Inc/GPIOxDriver.h \
- /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/PeripheralDrivers/Inc/PLLDriver.h
+ /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Inc/GPIOxDriver.h \
+ /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Inc/PLLDriver.h
 /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/Base_FreeRTOS/ThirdParty/FreeRTOS/include/FreeRTOS.h:
 ../Inc/FreeRTOSConfig.h:
 /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/Base_FreeRTOS/ThirdParty/SEGGER/OS/SEGGER_SYSVIEW_FreeRTOS.h:
@@ -49,5 +49,5 @@ Src/main.o: ../Src/main.c \
 /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/STM32Cube_FW_F4_V1.27.0/Drivers/CMSIS/Core/Include/cmsis_gcc.h:
 /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/STM32Cube_FW_F4_V1.27.0/Drivers/CMSIS/Core/Include/mpu_armv7.h:
 /home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/STM32Cube_FW_F4_V1.27.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h:
-/home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/PeripheralDrivers/Inc/GPIOxDriver.h:
-/home/miller/Documentos/GitHub/TestRobotics/FreeRTOS_Workspace/PeripheralDrivers/Inc/PLLDriver.h:
+/home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Inc/GPIOxDriver.h:
+/home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Inc/PLLDriver.h:
