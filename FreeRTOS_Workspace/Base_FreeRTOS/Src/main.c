@@ -102,6 +102,8 @@ void vTaskOne( void * pvParameters )
     {
         /* Task code goes here. */
     	printf("%s\n", (char*)pvParameters);
+    	/* Task Yield es una instrucción que permite que si la tarea terminó,
+    	 * que le de su tiempo de ejecución restante */
     	taskYIELD();
     }
 }

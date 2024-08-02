@@ -30,7 +30,7 @@
 #define STACK_SIZE 200
 
 /* Definición de variables del sistema */
-uint32_t SystemCoreClock = 16000000;
+uint32_t SystemCoreClock = 100000000;
 
 /* Periféricos del sistema */
 GPIO_Handler_t handlerBlinkyPin = {0};	// LED de estado del Pin A5
@@ -97,7 +97,7 @@ int main(void)
 
 /** Función que inicia todo el sistema*/
 void initSystem(void){
-	//configPLL(100);
+	configPLL(100);
 
 	/* GPIO y Timer del Blinky Led de Estado PA5 */
 	handlerBlinkyPin.pGPIOx								= GPIOA;
