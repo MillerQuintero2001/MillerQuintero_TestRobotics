@@ -42,7 +42,7 @@ extern TaskHandle_t xHandleTask_Commands;
 /* Prototipos de funciones de FreeRTOS */
 void vTask_Menu( void * pvParameters );
 void vTask_Print( void * pvParameters );
-void vTask_Commands( void * pvParamters);
+void vTask_Commands( void * pvParameters);
 
 void led_state_callback(TimerHandle_t xTimer);
 
@@ -51,6 +51,6 @@ extern QueueHandle_t xQueue_Print;
 
 extern state_t next_state;
 
-extern USART_Handler_t commTerm_Handler;
+extern USART_Handler_t usartComm;
 
 #endif /* MAIN_H_ */

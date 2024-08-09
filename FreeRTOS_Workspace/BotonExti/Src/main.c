@@ -1,5 +1,5 @@
 /*
- * UsartTest.c
+ * main.c
  *
  *  Created on: Jul 31, 2024
  *      Author: MillerQuintero2001
@@ -38,7 +38,7 @@ TimerHandle_t handle_led_timer;
 void initSystem(void);
 extern void vTask_Menu( void * pvParameters );
 extern void vTask_Print( void * pvParameters );
-extern void vTask_Commands( void * pvParamters);
+extern void vTask_Commands( void * pvParameters);
 
 int main(void)
 {
@@ -46,10 +46,10 @@ int main(void)
 	initSystem();
 
 	/* Activamos la unidad de punto flotante (FPU) */
-	SCB->CPACR    |= (0xF << 20);
+	SCB->CPACR	|= (0xF << 20);
 
 	/* Activamos del contador de Ticks */
-	DWT->CTRL    |= (1 << 0);
+	DWT->CTRL	|= (1 << 0);
 
 //	/* Necesario para el SEGGER*/
 //	vInitPrioGroupValue();
@@ -102,8 +102,9 @@ int main(void)
     xQueue_InputData = xQueueCreate(10, sizeof(char));
     configASSERT(xQueue_InputData != NULL);		// Verificamos que se ha creado la queue
 
-    xQueue_InputData = xQueueCreate(10, sizeof(size_t));
-    configASSERT(xQueue_InputData != NULL);		// Verificamos que se ha creado la queue
+    //xQueue_Print = xQueueCreate(10, sizeof(struct AMessage *));
+    xQueue_Print = xQueueCreate(10, sizeof(size_t));
+    configASSERT(xQueue_Print != NULL);		// Verificamos que se ha creado la queue
 
     /* Creando el timer */
     handle_led_timer = xTimerCreate("led_timer", pdMS_TO_TICKS(500), pdTRUE, (void*)(1), led_state_callback);
@@ -115,11 +116,11 @@ int main(void)
 
     /* Loop forever */
 	while(1){
-		/* Si llegamos acá, es que algo salio mal...*/
+		/* Si llegamos acá, es que algo salió mal...*/
 	}
 }
 
-/** Función que inicia todo el sistema*/
+/** Función que inicia todo el sistema */
 void initSystem(void){
 	configPLL(100);
 
@@ -138,13 +139,12 @@ void initSystem(void){
 	handlerButton.GPIO_PinConfig.GPIO_PinNumber			= PIN_13;
 	handlerButton.GPIO_PinConfig.GPIO_PinMode			= GPIO_MODE_IN;
 	handlerButton.GPIO_PinConfig.GPIO_PinPuPdControl	= GPIO_PUPDR_NOTHING;
+	GPIO_Config(&handlerButton);
 
 	/* Configuración de pines para el USART1 */
 	handlerTx.pGPIOx								= GPIOA;
 	handlerTx.GPIO_PinConfig.GPIO_PinNumber 		= PIN_2;
 	handlerTx.GPIO_PinConfig.GPIO_PinMode			= GPIO_MODE_ALTFN;
-	handlerTx.GPIO_PinConfig.GPIO_PinOPType			= GPIO_OTYPE_PUSHPULL;
-	handlerTx.GPIO_PinConfig.GPIO_PinPuPdControl	= GPIO_PUPDR_NOTHING;
 	handlerTx.GPIO_PinConfig.GPIO_PinSpeed			= GPIO_OSPEED_HIGH;
 	handlerTx.GPIO_PinConfig.GPIO_PinAltFunMode		= AF7;
 	GPIO_Config(&handlerTx);
@@ -152,8 +152,6 @@ void initSystem(void){
 	handlerRx.pGPIOx								= GPIOA;
 	handlerRx.GPIO_PinConfig.GPIO_PinNumber 		= PIN_3;
 	handlerRx.GPIO_PinConfig.GPIO_PinMode			= GPIO_MODE_ALTFN;
-	handlerRx.GPIO_PinConfig.GPIO_PinOPType			= GPIO_OTYPE_PUSHPULL;
-	handlerRx.GPIO_PinConfig.GPIO_PinPuPdControl	= GPIO_PUPDR_NOTHING;
 	handlerRx.GPIO_PinConfig.GPIO_PinSpeed			= GPIO_OSPEED_HIGH;
 	handlerRx.GPIO_PinConfig.GPIO_PinAltFunMode		= AF7;
 	GPIO_Config(&handlerRx);
@@ -169,17 +167,16 @@ void initSystem(void){
 	usartComm.USART_Config.USART_enableIntTX		= USART_TX_INTERRUP_DISABLE;
 	usartComm.USART_Config.USART_priorityInterrupt	= 6;
 	USART_Config(&usartComm);
-
-
 }
 
 
+/** Interrupción debida al puerto serial */
 void usart2Rx_Callback(void){
 	usartData = getRxData();
 
 	BaseType_t xHigherPriorityTaskWoken;
 	(void) xHigherPriorityTaskWoken;
-	/*We have not woken a task at the start of the ISR */
+	/* We have not woken a task at the start of the ISR */
 	xHigherPriorityTaskWoken = pdFALSE;
 
 	// Verificamos si la cola aún no está llena
@@ -187,15 +184,17 @@ void usart2Rx_Callback(void){
 
 	/* Si NO es true, entonces aún hay espacio */
 	if(xReturned != pdTRUE){
+		//xReturned = xQueueSendToBackFromISR(xQueue_InputData, (void*)&usartData, NULL);
 		xQueueSendToBackFromISR(xQueue_InputData, (void*)&usartData, NULL);
 	}
 	else{
-		// Queue (cola) está llena
+		// Queue is full (la cola está llena)
 		if(usartData == '#'){
 			xQueueReceiveFromISR(xQueue_InputData, (void*)&usartData, NULL);
 			xQueueSendToBackFromISR(xQueue_InputData, (void*)&usartData, NULL);
 		}
 	}
+	/* Send notification to command task -> command received : usartData == '#'*/
 	if(usartData == '#'){
 		/* Send Notification */
 		xTaskNotifyFromISR(xHandleTask_Commands, 0, eNoAction, NULL);
