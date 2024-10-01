@@ -1925,7 +1925,7 @@ Discarded input sections
  .data          0x0000000000000000        0x0 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
  .bss           0x0000000000000000        0x0 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
  .text.getConfigPLL
-                0x0000000000000000       0x74 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
+                0x0000000000000000       0x5c /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
  .text.changeMCO1
                 0x0000000000000000       0x58 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
  .text.changeMCO2
@@ -2782,7 +2782,7 @@ LOAD /opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.
 LOAD /opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libm.a
 LOAD /opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v7e-m+fp/hard/libgcc.a
 
-.debug_info     0x0000000000000000     0xbf52
+.debug_info     0x0000000000000000     0xbf3a
  .debug_info    0x0000000000000000      0x8a9 ./Src/main.o
  .debug_info    0x00000000000008a9       0x22 ./Startup/startup_stm32f411retx.o
  .debug_info    0x00000000000008cb      0x2d1 ./ThirdParty/FreeRTOS/list.o
@@ -2797,7 +2797,7 @@ LOAD /opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.
  .debug_info    0x0000000000007e14       0x26 ./ThirdParty/SEGGER/SEGGER/SEGGER_RTT_ASM_ARMv7M.o
  .debug_info    0x0000000000007e3a     0x380a ./ThirdParty/SEGGER/SEGGER/SEGGER_SYSVIEW.o
  .debug_info    0x000000000000b644      0x4d6 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(GPIOxDriver.o)
- .debug_info    0x000000000000bb1a      0x438 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
+ .debug_info    0x000000000000bb1a      0x420 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
 
 .debug_abbrev   0x0000000000000000     0x1c42
  .debug_abbrev  0x0000000000000000      0x280 ./Src/main.o
@@ -2951,7 +2951,7 @@ LOAD /opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.
  .debug_macro   0x0000000000011aa0      0x118 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(GPIOxDriver.o)
  .debug_macro   0x0000000000011bb8       0xd7 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
 
-.debug_line     0x0000000000000000     0xbc6d
+.debug_line     0x0000000000000000     0xbc6a
  .debug_line    0x0000000000000000      0xb4f ./Src/main.o
  .debug_line    0x0000000000000b4f       0x84 ./Startup/startup_stm32f411retx.o
  .debug_line    0x0000000000000bd3      0x8f1 ./ThirdParty/FreeRTOS/list.o
@@ -2966,9 +2966,9 @@ LOAD /opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.
  .debug_line    0x0000000000008f31       0xa0 ./ThirdParty/SEGGER/SEGGER/SEGGER_RTT_ASM_ARMv7M.o
  .debug_line    0x0000000000008fd1     0x1f53 ./ThirdParty/SEGGER/SEGGER/SEGGER_SYSVIEW.o
  .debug_line    0x000000000000af24      0x707 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(GPIOxDriver.o)
- .debug_line    0x000000000000b62b      0x642 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
+ .debug_line    0x000000000000b62b      0x63f /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
 
-.debug_str      0x0000000000000000    0x639ed
+.debug_str      0x0000000000000000    0x639e2
  .debug_str     0x0000000000000000    0x5d057 ./Src/main.o
                                       0x5d2dc (size before relaxing)
  .debug_str     0x000000000005d057       0x31 ./Startup/startup_stm32f411retx.o
@@ -2997,8 +2997,8 @@ LOAD /opt/st/stm32cubeide_1.10.1/plugins/com.st.stm32cube.ide.mcu.externaltools.
                                        0x97ce (size before relaxing)
  .debug_str     0x00000000000637ab      0x1a1 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(GPIOxDriver.o)
                                       0x4fece (size before relaxing)
- .debug_str     0x000000000006394c       0xa1 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
-                                      0x4fcad (size before relaxing)
+ .debug_str     0x000000000006394c       0x96 /home/miller/Documentos/GitHub/MillerQuintero_Tareas_Proyectos_Taller_5/PeripheralDrivers/Debug/libPeripheralDrivers.a(PLLDriver.o)
+                                      0x4fc99 (size before relaxing)
 
 .comment        0x0000000000000000       0x50
  .comment       0x0000000000000000       0x50 ./Src/main.o

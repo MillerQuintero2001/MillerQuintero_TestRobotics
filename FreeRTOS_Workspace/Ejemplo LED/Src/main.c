@@ -139,8 +139,6 @@ void vTask_Blink_Led( void * pvParameters )
     	else{
     		GPIO_WritePin(&handlerBlinkyPin, RESET);
     	}
-    	//printf("%s\n", (char*)pvParameters);
-    	//taskYIELD();
     	notify = xTaskNotifyWait(0,0,NULL,pdMS_TO_TICKS(250));
     	//vTaskDelay(pdMS_TO_TICKS(250));
     }
@@ -166,8 +164,6 @@ void vTaskTwo( void * pvParameters )
     	}
     	prev_button_state = button_state;
     	vTaskDelay(pdMS_TO_TICKS(10));
-//    	printf("%s\n", (char*)pvParameters);
-//    	taskYIELD();
     }
 }
 

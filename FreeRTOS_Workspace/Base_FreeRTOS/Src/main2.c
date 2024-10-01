@@ -44,7 +44,7 @@ int main(void)
 {
 
 	/* Activamos la unidad de punto flotante (FPU) */
-	//SCB->CPACR    |= (0xF << 20);
+	SCB->CPACR    |= (0xF << 20);
 
 	/* Activamos del contador de Ticks */
 	DWT->CTRL    |= (1 << 0);
