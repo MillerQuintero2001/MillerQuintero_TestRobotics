@@ -880,7 +880,7 @@ void initSystem(void){
 	DWT->CTRL |= (1 << 0);
 
 	/* GPIO y Timer del Blinky Led de Estado */
-	handlerBlinkyPin.pGPIOx								= GPIOA;
+	handlerBlinkyPin.pGPIOx								= GPIOC;
 	handlerBlinkyPin.GPIO_PinConfig.GPIO_PinNumber 		= PIN_5;
 	handlerBlinkyPin.GPIO_PinConfig.GPIO_PinMode		= GPIO_MODE_OUT;
 	handlerBlinkyPin.GPIO_PinConfig.GPIO_PinSpeed 		= GPIO_OSPEED_FAST;
@@ -894,21 +894,21 @@ void initSystem(void){
 
 	/* Pinout's configuration for USART */
 	handlerPinTX.pGPIOx								= GPIOA;
-	handlerPinTX.GPIO_PinConfig.GPIO_PinNumber 		= PIN_2;
+	handlerPinTX.GPIO_PinConfig.GPIO_PinNumber 		= PIN_9;
 	handlerPinTX.GPIO_PinConfig.GPIO_PinMode		= GPIO_MODE_ALTFN;
 	handlerPinTX.GPIO_PinConfig.GPIO_PinSpeed		= GPIO_OSPEED_FAST;
 	handlerPinTX.GPIO_PinConfig.GPIO_PinAltFunMode	= AF7;
 	GPIO_Config(&handlerPinTX);
 
 	handlerPinRX.pGPIOx								= GPIOA;
-	handlerPinRX.GPIO_PinConfig.GPIO_PinNumber 		= PIN_3;
+	handlerPinRX.GPIO_PinConfig.GPIO_PinNumber 		= PIN_10;
 	handlerPinRX.GPIO_PinConfig.GPIO_PinMode		= GPIO_MODE_ALTFN;
 	handlerPinRX.GPIO_PinConfig.GPIO_PinSpeed		= GPIO_OSPEED_FAST;
 	handlerPinRX.GPIO_PinConfig.GPIO_PinAltFunMode	= AF7;
 	GPIO_Config(&handlerPinRX);
 
 	/* Serial Comm COnfiguration */
-	usartCmd.ptrUSARTx								= USART2;
+	usartCmd.ptrUSARTx								= USART1;
 	usartCmd.USART_Config.USART_baudrate 			= USART_BAUDRATE_19200;
 	usartCmd.USART_Config.USART_datasize			= USART_DATASIZE_8BIT;
 	usartCmd.USART_Config.USART_parity				= USART_PARITY_NONE;
@@ -919,7 +919,6 @@ void initSystem(void){
 	usartCmd.USART_Config.USART_priorityInterrupt	= 6;
 	USART_Config(&usartCmd);
 
-	configMPU6050();
 	configMotors();
 }
 
@@ -1087,13 +1086,13 @@ void oppyPath(void){
 		}
 	}
 
-	// Finally, on the gol, Oppy rotates -globalAngle to set up itself to default orientation
+	// Finally, on the goal, Oppy rotates -globalAngle to set up itself to default orientation
 	rotateOppy(-globalAngle);
 }
 
 
 /** Interrupción del USART2 */
-void usart2Rx_Callback(void){
+void usart1Rx_Callback(void){
 	usartData = getRxData();
 	writeChar(&usartCmd, usartData);
 	// Simple instruction
