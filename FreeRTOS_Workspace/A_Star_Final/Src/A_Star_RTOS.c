@@ -20,6 +20,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
+#include "semphr.h"
 
 /* MCU functions and macros */
 #include <stm32f4xx.h>
@@ -37,6 +38,10 @@
 #include "GPIOxDriver.h"
 #include "BasicTimer.h"
 #include "USARTxDriver.h"
+
+/* Oppy's Drivers */
+#include "MotorDriver.h"
+#include "MPU6050.h"
 
 /* Base structures and functions for A* algorithm */
 #include "Single_Cell.h"
@@ -86,19 +91,24 @@ bool flagMap = false;
 uint8_t line = 0;
 
 int8_t oppyIndicator = -1;
-bool flagDoIt = false;
 
 // FreeRTOS Variables
-BaseType_t xReturned;				// Variable that receives the return of FreeRTOS elements creation
-
-TimerHandle_t handle_led_timer;		// Software timer for blinky pin
-
+BaseType_t xReturned;								// Variable that receives the return of FreeRTOS elements creation
+TimerHandle_t handle_led_timer;						// Software timer for blinky pin
+TaskHandle_t xHandleTask_Get_Map = NULL;
 TaskHandle_t xHandleTask_Prepare_A_Star = NULL;
 TaskHandle_t xHandleTask_Solve_A_Star = NULL;
-TaskHandle_t xHandleTask_Print_Map = NULL;
 TaskHandle_t xHandleTask_Oppy_Movement = NULL;
+SemaphoreHandle_t xBinarySemaphore = NULL;
+
 
 /* Functions Prototypes */
+// Related with FreeRTOS
+void vTask_Catch_Map(void *pvParameters);
+void vTask_Prepare_A_Star(void *pvParameters);
+void vTask_Solve_A_Star( void *pvParameters);
+void vTask_Oppy_Path( void *pvParameters);
+void led_state_callback(TimerHandle_t xTimer);
 
 // Related with A* pathfinding
 void init_empty_grid_map(uint8_t gridCols, uint8_t gridRows, Cell_map_t *cellArray);			// Ready
@@ -130,32 +140,36 @@ void initSystem(void);
 void catchMap(void);
 void oppyPath(void);
 
-// Related with FreeRTOS
-void vTask_Prepare_A_Star(void *pvParameters);
-void vTask_Solve_A_Star( void *pvParameters);
-//void vTask_Print_Map( void *pvParameters);
-//void vTask_Oppy_Path( void *pvParameters);
-
-void led_state_callback( TimerHandle_t xTimer );
-
 
 int main(void)
 {
 
 	initSystem();
+	writeMsg(&usartCmd, "Hola mundo.\n");
 
     /* Creating and activating timer that controls blinky led state */
-    handle_led_timer = xTimerCreate("led_timer", pdMS_TO_TICKS(250), pdTRUE, (void*)(1), led_state_callback);
+	handle_led_timer = xTimerCreate("led_timer", pdMS_TO_TICKS(250), pdTRUE, (void*)(1), led_state_callback);
    	xTimerStart(handle_led_timer, portMAX_DELAY);
 
+
+	/* Creating Catch Map Task */
+    xReturned = xTaskCreate(
+    		vTask_Catch_Map,      					/* Function that implements the task. */
+            "Task-Catch_Map",          				/* Text name for the task. */
+			STACK_SIZE,      						/* Stack size in words, not bytes. */
+            "Receiving map by USART.\n",   			/* Parameter passed into the task. */
+            2, 										/* Priority at which the task is created. */
+            &xHandleTask_Prepare_A_Star);      		/* Used to pass out the created task's handle. */
+
+    configASSERT(xReturned == pdPASS);
 
 	/* Creating Prepare A* Task */
     xReturned = xTaskCreate(
     		vTask_Prepare_A_Star,      				/* Function that implements the task. */
             "Task-Prepare-A*",          			/* Text name for the task. */
 			STACK_SIZE,      						/* Stack size in words, not bytes. */
-            "Previous steps for A*.\n",   				/* Parameter passed into the task. */
-            4, 										/* Priority at which the task is created. */
+            "Previous steps for A*.\n",   			/* Parameter passed into the task. */
+            2, 										/* Priority at which the task is created. */
             &xHandleTask_Prepare_A_Star);      		/* Used to pass out the created task's handle. */
 
     configASSERT(xReturned == pdPASS);
@@ -165,27 +179,57 @@ int main(void)
     		vTask_Solve_A_Star,      				/* Function that implements the task. */
             "Task-Solve-A*",          				/* Text name for the task. */
 			STACK_SIZE,      						/* Stack size in words, not bytes. */
-            "Solving map with A*\n",   			/* Parameter passed into the task. */
-            3, 										/* Priority at which the task is created. */
+            "Solving map with A*.\n",   			/* Parameter passed into the task. */
+            2, 										/* Priority at which the task is created. */
             &xHandleTask_Solve_A_Star);      		/* Used to pass out the created task's handle. */
 
     configASSERT(xReturned == pdPASS);
 
-    /* Ejecutamos el programador de inicio de tareas */
+    /* Creating Oppy Movement through the path Task */
+    xReturned = xTaskCreate(
+    		vTask_Oppy_Path,      					/* Function that implements the task. */
+            "Task-Oppy-Path*",          			/* Text name for the task. */
+			STACK_SIZE,      						/* Stack size in words, not bytes. */
+            "Manage Oppy's movement *\n",   		/* Parameter passed into the task. */
+            1, 										/* Priority at which the task is created. */
+            &xHandleTask_Oppy_Movement);      		/* Used to pass out the created task's handle. */
+
+    configASSERT(xReturned == pdPASS);
+
+    /* Creating Semaphore */
+    xBinarySemaphore = xSemaphoreCreateBinary();
+    configASSERT(xBinarySemaphore != NULL);
+
+    /* Execute Task Scheduler */
     vTaskStartScheduler();
 
     /* Loop forever */
 	while(1){
-		/* Si llegamos acá, es que algo falla */
-
+		// If we got this far, something went wrong
 	}
 }
 
 
+void vTask_Catch_Map(void *pvParameters){
+	while(1){
+		catchMap();
+
+		xTaskNotifyGive(xHandleTask_Prepare_A_Star);
+		xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
+	}
+
+
+}
+
 void vTask_Prepare_A_Star(void *pvParameters){
 	while(1){
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
 		/* 1. Create all cells empty, it is an empty map */
 		init_empty_grid_map(grid_cols, grid_rows, grid_map_cells);
+		open_list_index = 0;
+		closed_list_index = 0;
+		oppyIndicator = -1;
 
 		/* 2. Create an empty cell and assign it as the first open list element */
 		empty_cell = create_cell(11,11);
@@ -193,17 +237,17 @@ void vTask_Prepare_A_Star(void *pvParameters){
 
 
 		/* 3. Fill the array of cells with the entered map */
-	//	for(uint8_t j = 0; j < MAP_GRID_ROWS; j++){
-	//		populate_grid(map_string[j], j, grid_map_cells);
-	//	}
-		populate_grid(". . . . . . . . . . ", 0, grid_map_cells);
-		populate_grid(". . . . . . . . . . ", 1, grid_map_cells);
-		populate_grid(". . . G . . . . . . ", 2, grid_map_cells);
-		populate_grid(". . # # # # . . . . ", 3, grid_map_cells);
-		populate_grid(". . . . . . . . . . ", 4, grid_map_cells);
-		populate_grid(". . . . . S . . . . ", 5, grid_map_cells);
-		populate_grid(". . . . . . . . . . ", 6, grid_map_cells);
-		populate_grid(". . . . . . . . . . ", 7, grid_map_cells);
+		for(uint8_t j = 0; j < MAP_GRID_ROWS; j++){
+			populate_grid(map_string[j], j, grid_map_cells);
+		}
+//		populate_grid(". . . . . . . . . . ", 0, grid_map_cells);
+//		populate_grid(". . . . . . . . . . ", 1, grid_map_cells);
+//		populate_grid(". . . G . . . . . . ", 2, grid_map_cells);
+//		populate_grid(". . # # # # . . . . ", 3, grid_map_cells);
+//		populate_grid(". . . . . . . . . . ", 4, grid_map_cells);
+//		populate_grid(". . . . . S . . . . ", 5, grid_map_cells);
+//		populate_grid(". . . . . . . . . . ", 6, grid_map_cells);
+//		populate_grid(". . . . . . . . . . ", 7, grid_map_cells);
 
 		/* 3. Prints in screen the map send by USART to verificate */
 		ptr_goal_cell = get_cell_goal(grid_map_cells, grid_cols, grid_rows);
@@ -220,22 +264,31 @@ void vTask_Prepare_A_Star(void *pvParameters){
 			identify_cell_neighbours(grid_map_cells, (grid_map_cells+k));
 		}
 
-		xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+		xTaskNotifyGive(xHandleTask_Solve_A_Star);
 	}
 }
 
 
 void vTask_Solve_A_Star( void *pvParameters){
 	while(1){
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
 		oppyIndicator = A_star_algorithm();
 		print_map(grid_cols, grid_rows, grid_map_cells);
-
-		xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
 	}
 }
 
-/*Controla el estado del Led */
-void led_state_callback( TimerHandle_t xTimer ){
+
+void vTask_Oppy_Path( void *pvParameters){
+	while(1){
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		oppyPath();
+	}
+
+}
+
+/** Controlls state led */
+void led_state_callback(TimerHandle_t xTimer){
 	GPIOxTooglePin(&handlerBlinkyPin);
 }
 
@@ -431,6 +484,7 @@ uint8_t get_count_item_open_list(void) {
 	}
 	return counter;
 }
+
 /** Remueve el elemento indicado por el puntero working_cell, que además debería ser el elemento más arriba en la lista de open_list */
 void removeFrom_open_list(Cell_map_t *working_cell){
 	Cell_map_t *ptr_element = *open_list;
@@ -838,7 +892,6 @@ void initSystem(void){
 	/* Fin del GPIO y Timer del LED de estado
 	 * ----------------------------------------*/
 
-
 	/* Pinout's configuration for USART */
 	handlerPinTX.pGPIOx								= GPIOA;
 	handlerPinTX.GPIO_PinConfig.GPIO_PinNumber 		= PIN_2;
@@ -865,19 +918,198 @@ void initSystem(void){
 	usartCmd.USART_Config.USART_enableIntTX			= USART_TX_INTERRUP_DISABLE;
 	usartCmd.USART_Config.USART_priorityInterrupt	= 6;
 	USART_Config(&usartCmd);
+
+	configMPU6050();
+	configMotors();
 }
+
+
+/** Function to enter the map via serial port */
+void catchMap(void){
+	while(!flagMap){
+		if(usartData != '\0'){
+			bufferReception[line][counterReception] = usartData;
+			counterReception++;
+
+			// Aqui hacemmos la instrucción que detine la recepción del comando
+			if(usartData == '@'){
+				writeChar(&usartCmd, '\n');
+				//Sustituyo el último caracter de \r por un null
+				bufferReception[line][counterReception - 1] = '\0';
+				for(uint8_t n = 0; n < (ROW_MAP_DATA_LEN + 1); n++){
+					map_string[line][n] = bufferReception[line][n];
+				}
+				line++;
+				counterReception = 0;
+			}
+			else{
+				__NOP();
+			}
+
+			// Para borrar lo que se haya digitado en la terminal
+			if(usartData == '\b'){
+				counterReception--;
+				counterReception--;
+			}
+			else{
+				__NOP();
+			}
+
+			// Volvemos a null para terminar
+			usartData = '\0';
+			flagMap = (line == MAP_GRID_ROWS) ? (true):(false);
+			line = (line == MAP_GRID_ROWS) ? (0):(line);
+		}
+		else{
+			__NOP();
+		}
+	}
+}
+
+
+/** Function responsible for manage Oppy movement according to A* Algorithm */
+void oppyPath(void){
+
+	// In this block, we count how many cells are in the path founded
+	Cell_map_t *ptrAux = ptr_goal_cell;
+	uint8_t numberOfCells = 1;
+	while(ptrAux->ptr_parent != NULL){
+		numberOfCells++;
+		ptrAux = ptrAux->ptr_parent;
+	}
+	sprintf(bufferMsg, "The number of path cells is: %hu", numberOfCells);
+	writeMsg(&usartCmd, bufferMsg);
+
+	// Now, we create and array or pointers, to save the reference to each path cell, this process is saving in reverse, from the end to the begin.
+	Cell_map_t *ptrArray[numberOfCells];
+	ptrAux = ptr_goal_cell;
+	for(uint8_t i = numberOfCells; i > 0; i--){
+		ptrArray[i-1] = ptrAux;
+		ptrAux = ptrAux->ptr_parent;
+	}
+
+
+	Cell_map_t *ptrNext = NULL;
+
+	uint8_t dirIndicator = 0;
+
+	int16_t globalAngle = 0;
+	int16_t differentialAngle = 0;
+	differentialAngle++;
+
+	// Loop to move through the path, in begins in 1, because start cell doesn't count
+	for(uint8_t path = 1; path < numberOfCells; path++){
+		// Update the pointers
+		ptrAux = ptrArray[path-1];
+		ptrNext = ptrArray[path];
+
+		// This loop is to get the direction indicator
+		for(uint j = 0; j < MAX_NEIGHBOURS; j++){
+			if(ptrAux->neighbours[j] == ptrNext){
+				dirIndicator = j;
+				break;
+			}
+			else{
+				__NOP();
+			}
+		}
+
+		// Switch-case block to do the movement according to the direction indicator
+		switch (dirIndicator) {
+			// 0. Diagonal left above
+			case 0: {
+				differentialAngle = (abs(45 - globalAngle) > 180) ? ((45 - globalAngle) + 360):(45 - globalAngle);
+				rotateOppy(differentialAngle);
+				globalAngle = 45;
+				pathSegment(DIAGONAL_LENGTH);
+				break;
+			}
+			// 1. Above
+			case 1: {
+				differentialAngle = (abs(0 - globalAngle) > 180) ? ((0 - globalAngle) + 360):(0 - globalAngle);
+				rotateOppy(differentialAngle);
+				globalAngle = 0;
+				pathSegment(STRAIGHT_LENGTH);
+				break;
+			}
+			// 2. Diagonal right above
+			case 2: {
+				differentialAngle = (abs(-45 - globalAngle) > 180) ? ((-45 - globalAngle) + 360):(-45 - globalAngle);
+				rotateOppy(differentialAngle);
+				globalAngle = -45;
+				pathSegment(DIAGONAL_LENGTH);
+				break;
+			}
+			// 3. Left
+			case 3: {
+				differentialAngle = (abs(90 - globalAngle) > 180) ? ((90 - globalAngle) + 360):(90 - globalAngle);
+				rotateOppy(differentialAngle);
+				globalAngle = 90;
+				pathSegment(STRAIGHT_LENGTH);
+				break;
+			}
+			// 4. Right
+			case 4: {
+				differentialAngle = (abs(-90 - globalAngle) > 180) ? ((-90 - globalAngle) + 360):(-90 - globalAngle);
+				rotateOppy(differentialAngle);
+				globalAngle = -90;
+				pathSegment(STRAIGHT_LENGTH);
+				break;
+			}
+			// 5. Diagonal left below
+			case 5: {
+				differentialAngle = (abs(135 - globalAngle) > 180) ? ((135 - globalAngle) + 360):(135 - globalAngle);
+				rotateOppy(differentialAngle);
+				globalAngle = 135;
+				pathSegment(DIAGONAL_LENGTH);
+				break;
+			}
+			// 6. Below
+			case 6: {
+				differentialAngle = (globalAngle < 0) ? (-180 - globalAngle):(180 - globalAngle);
+				rotateOppy(differentialAngle);
+				globalAngle = 180;
+				pathSegment(STRAIGHT_LENGTH);
+				break;
+			}
+			// 7. Diagonal right below
+			case 7: {
+				differentialAngle = (abs(-135 - globalAngle) > 180) ? ((-135 - globalAngle) + 360):(-135 - globalAngle);
+				rotateOppy(differentialAngle);
+				globalAngle = -135;
+				pathSegment(DIAGONAL_LENGTH);
+				break;
+			}
+			default:{
+				__NOP();
+				break;
+			}
+		}
+	}
+
+	// Finally, on the gol, Oppy rotates -globalAngle to set up itself to default orientation
+	rotateOppy(-globalAngle);
+}
+
 
 /** Interrupción del USART2 */
 void usart2Rx_Callback(void){
 	usartData = getRxData();
 	writeChar(&usartCmd, usartData);
-//	// Simple instruction
-//	if(usartData == 'M'){
-//		writeChar(&usartCmd, '\n');
-//		flagDoIt = true;
-//	}
-//	else{
-//		__NOP();
-//	}
+	// Simple instruction
+	if ((usartData == 'R')&&(oppyIndicator == 0)){
+		writeChar(&usartCmd, '\n');
+		flagMap = false;
+		oppyIndicator = -1;
+		usartData = 0;
+		xSemaphoreGiveFromISR(xBinarySemaphore, NULL);
+	}
+	else if ((usartData == 'M')&&(oppyIndicator == 0)){
+		usartData = 0;
+		xTaskNotifyFromISR(xHandleTask_Oppy_Movement, 0, eNoAction, NULL);
+	}
+	else{
+		__NOP();
+	}
 }
 
