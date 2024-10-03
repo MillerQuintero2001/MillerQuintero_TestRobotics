@@ -109,6 +109,7 @@ void vTask_Prepare_A_Star(void *pvParameters);
 void vTask_Solve_A_Star( void *pvParameters);
 void vTask_Oppy_Path( void *pvParameters);
 void led_state_callback(TimerHandle_t xTimer);
+void busy_delay(float miliseconds);
 
 // Related with A* pathfinding
 void init_empty_grid_map(uint8_t gridCols, uint8_t gridRows, Cell_map_t *cellArray);			// Ready
@@ -292,6 +293,16 @@ void led_state_callback(TimerHandle_t xTimer){
 	GPIOxTooglePin(&handlerBlinkyPin);
 }
 
+/** Implements a delay with the ticks counter */
+void busy_delay(float miliseconds){
+	TickType_t startTick = xTaskGetTickCount();  // Obtener el tick actual
+	TickType_t delayTicks = pdMS_TO_TICKS(miliseconds);  // Convertir ms a ticks
+
+	// Bucle de espera activa hasta que transcurra el tiempo
+	while ((xTaskGetTickCount() - startTick) < delayTicks) {
+		__NOP();
+	}
+}
 
 /**
  * Esta función se encarga de devolver la distancia "directa" entre la celda X en la que se
@@ -1019,6 +1030,7 @@ void oppyPath(void){
 			case 0: {
 				differentialAngle = (abs(45 - globalAngle) > 180) ? ((45 - globalAngle) + 360):(45 - globalAngle);
 				rotateOppy(differentialAngle);
+				busy_delay(250);
 				globalAngle = 45;
 				pathSegment(DIAGONAL_LENGTH);
 				break;
@@ -1027,6 +1039,7 @@ void oppyPath(void){
 			case 1: {
 				differentialAngle = (abs(0 - globalAngle) > 180) ? ((0 - globalAngle) + 360):(0 - globalAngle);
 				rotateOppy(differentialAngle);
+				busy_delay(250);
 				globalAngle = 0;
 				pathSegment(STRAIGHT_LENGTH);
 				break;
@@ -1035,6 +1048,7 @@ void oppyPath(void){
 			case 2: {
 				differentialAngle = (abs(-45 - globalAngle) > 180) ? ((-45 - globalAngle) + 360):(-45 - globalAngle);
 				rotateOppy(differentialAngle);
+				busy_delay(250);
 				globalAngle = -45;
 				pathSegment(DIAGONAL_LENGTH);
 				break;
@@ -1043,6 +1057,7 @@ void oppyPath(void){
 			case 3: {
 				differentialAngle = (abs(90 - globalAngle) > 180) ? ((90 - globalAngle) + 360):(90 - globalAngle);
 				rotateOppy(differentialAngle);
+				busy_delay(250);
 				globalAngle = 90;
 				pathSegment(STRAIGHT_LENGTH);
 				break;
@@ -1051,6 +1066,7 @@ void oppyPath(void){
 			case 4: {
 				differentialAngle = (abs(-90 - globalAngle) > 180) ? ((-90 - globalAngle) + 360):(-90 - globalAngle);
 				rotateOppy(differentialAngle);
+				busy_delay(250);
 				globalAngle = -90;
 				pathSegment(STRAIGHT_LENGTH);
 				break;
@@ -1059,6 +1075,7 @@ void oppyPath(void){
 			case 5: {
 				differentialAngle = (abs(135 - globalAngle) > 180) ? ((135 - globalAngle) + 360):(135 - globalAngle);
 				rotateOppy(differentialAngle);
+				busy_delay(250);
 				globalAngle = 135;
 				pathSegment(DIAGONAL_LENGTH);
 				break;
@@ -1067,6 +1084,7 @@ void oppyPath(void){
 			case 6: {
 				differentialAngle = (globalAngle < 0) ? (-180 - globalAngle):(180 - globalAngle);
 				rotateOppy(differentialAngle);
+				busy_delay(250);
 				globalAngle = 180;
 				pathSegment(STRAIGHT_LENGTH);
 				break;
@@ -1075,6 +1093,7 @@ void oppyPath(void){
 			case 7: {
 				differentialAngle = (abs(-135 - globalAngle) > 180) ? ((-135 - globalAngle) + 360):(-135 - globalAngle);
 				rotateOppy(differentialAngle);
+				busy_delay(250);
 				globalAngle = -135;
 				pathSegment(DIAGONAL_LENGTH);
 				break;
@@ -1084,6 +1103,7 @@ void oppyPath(void){
 				break;
 			}
 		}
+		busy_delay(500);
 	}
 
 	// Finally, on the goal, Oppy rotates -globalAngle to set up itself to default orientation
