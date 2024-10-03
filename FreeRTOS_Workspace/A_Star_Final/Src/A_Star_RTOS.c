@@ -92,6 +92,9 @@ uint8_t line = 0;
 
 int8_t oppyIndicator = -1;
 
+float straightLength = 252.20f;
+float diagonalLength = 356.66f;
+
 // FreeRTOS Variables
 BaseType_t xReturned;								// Variable that receives the return of FreeRTOS elements creation
 TimerHandle_t handle_led_timer;						// Software timer for blinky pin
@@ -100,6 +103,11 @@ TaskHandle_t xHandleTask_Prepare_A_Star = NULL;
 TaskHandle_t xHandleTask_Solve_A_Star = NULL;
 TaskHandle_t xHandleTask_Oppy_Movement = NULL;
 SemaphoreHandle_t xBinarySemaphore = NULL;
+
+UBaseType_t uxHighWaterMark_Get_Map;
+UBaseType_t uxHighWaterMark_Prepare_A_Star;
+UBaseType_t uxHighWaterMark_Solve_A_Star;
+UBaseType_t uxHighWaterMark_Oppy_Movement;
 
 
 /* Functions Prototypes */
@@ -144,7 +152,6 @@ void oppyPath(void);
 
 int main(void)
 {
-
 	initSystem();
 	writeMsg(&usartCmd, "Hola mundo.\n");
 
@@ -168,7 +175,7 @@ int main(void)
     xReturned = xTaskCreate(
     		vTask_Prepare_A_Star,      				/* Function that implements the task. */
             "Task-Prepare-A*",          			/* Text name for the task. */
-			STACK_SIZE,      						/* Stack size in words, not bytes. */
+			150,      								/* Stack size in words, not bytes. */
             "Previous steps for A*.\n",   			/* Parameter passed into the task. */
             2, 										/* Priority at which the task is created. */
             &xHandleTask_Prepare_A_Star);      		/* Used to pass out the created task's handle. */
@@ -179,7 +186,7 @@ int main(void)
     xReturned = xTaskCreate(
     		vTask_Solve_A_Star,      				/* Function that implements the task. */
             "Task-Solve-A*",          				/* Text name for the task. */
-			STACK_SIZE,      						/* Stack size in words, not bytes. */
+			150,      								/* Stack size in words, not bytes. */
             "Solving map with A*.\n",   			/* Parameter passed into the task. */
             2, 										/* Priority at which the task is created. */
             &xHandleTask_Solve_A_Star);      		/* Used to pass out the created task's handle. */
@@ -190,7 +197,7 @@ int main(void)
     xReturned = xTaskCreate(
     		vTask_Oppy_Path,      					/* Function that implements the task. */
             "Task-Oppy-Path*",          			/* Text name for the task. */
-			STACK_SIZE,      						/* Stack size in words, not bytes. */
+			150,      								/* Stack size in words, not bytes. */
             "Manage Oppy's movement *\n",   		/* Parameter passed into the task. */
             1, 										/* Priority at which the task is created. */
             &xHandleTask_Oppy_Movement);      		/* Used to pass out the created task's handle. */
@@ -216,15 +223,17 @@ void vTask_Catch_Map(void *pvParameters){
 		catchMap();
 
 		xTaskNotifyGive(xHandleTask_Prepare_A_Star);
+
 		xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
+
+		uxHighWaterMark_Oppy_Movement = uxTaskGetStackHighWaterMark(xHandleTask_Oppy_Movement);
 	}
-
-
 }
 
 void vTask_Prepare_A_Star(void *pvParameters){
 	while(1){
 		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		uxHighWaterMark_Get_Map = uxTaskGetStackHighWaterMark(xHandleTask_Get_Map);
 
 		/* 1. Create all cells empty, it is an empty map */
 		init_empty_grid_map(grid_cols, grid_rows, grid_map_cells);
@@ -241,14 +250,6 @@ void vTask_Prepare_A_Star(void *pvParameters){
 		for(uint8_t j = 0; j < MAP_GRID_ROWS; j++){
 			populate_grid(map_string[j], j, grid_map_cells);
 		}
-//		populate_grid(". . . . . . . . . . ", 0, grid_map_cells);
-//		populate_grid(". . . . . . . . . . ", 1, grid_map_cells);
-//		populate_grid(". . . G . . . . . . ", 2, grid_map_cells);
-//		populate_grid(". . # # # # . . . . ", 3, grid_map_cells);
-//		populate_grid(". . . . . . . . . . ", 4, grid_map_cells);
-//		populate_grid(". . . . . S . . . . ", 5, grid_map_cells);
-//		populate_grid(". . . . . . . . . . ", 6, grid_map_cells);
-//		populate_grid(". . . . . . . . . . ", 7, grid_map_cells);
 
 		/* 3. Prints in screen the map send by USART to verificate */
 		ptr_goal_cell = get_cell_goal(grid_map_cells, grid_cols, grid_rows);
@@ -266,6 +267,7 @@ void vTask_Prepare_A_Star(void *pvParameters){
 		}
 
 		xTaskNotifyGive(xHandleTask_Solve_A_Star);
+
 	}
 }
 
@@ -273,6 +275,7 @@ void vTask_Prepare_A_Star(void *pvParameters){
 void vTask_Solve_A_Star( void *pvParameters){
 	while(1){
 		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		uxHighWaterMark_Prepare_A_Star = uxTaskGetStackHighWaterMark(xHandleTask_Prepare_A_Star);
 
 		oppyIndicator = A_star_algorithm();
 		print_map(grid_cols, grid_rows, grid_map_cells);
@@ -283,6 +286,7 @@ void vTask_Solve_A_Star( void *pvParameters){
 void vTask_Oppy_Path( void *pvParameters){
 	while(1){
 		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		uxHighWaterMark_Solve_A_Star = uxTaskGetStackHighWaterMark(xHandleTask_Solve_A_Star);
 		oppyPath();
 	}
 
@@ -987,7 +991,7 @@ void oppyPath(void){
 		numberOfCells++;
 		ptrAux = ptrAux->ptr_parent;
 	}
-	sprintf(bufferMsg, "The number of path cells is: %hu", numberOfCells);
+	sprintf(bufferMsg, "The number of path cells is: %hu.\n", numberOfCells);
 	writeMsg(&usartCmd, bufferMsg);
 
 	// Now, we create and array or pointers, to save the reference to each path cell, this process is saving in reverse, from the end to the begin.
@@ -1032,7 +1036,7 @@ void oppyPath(void){
 				rotateOppy(differentialAngle);
 				busy_delay(250);
 				globalAngle = 45;
-				pathSegment(DIAGONAL_LENGTH);
+				pathSegment(diagonalLength);
 				break;
 			}
 			// 1. Above
@@ -1041,7 +1045,7 @@ void oppyPath(void){
 				rotateOppy(differentialAngle);
 				busy_delay(250);
 				globalAngle = 0;
-				pathSegment(STRAIGHT_LENGTH);
+				pathSegment(straightLength);
 				break;
 			}
 			// 2. Diagonal right above
@@ -1050,7 +1054,7 @@ void oppyPath(void){
 				rotateOppy(differentialAngle);
 				busy_delay(250);
 				globalAngle = -45;
-				pathSegment(DIAGONAL_LENGTH);
+				pathSegment(diagonalLength);
 				break;
 			}
 			// 3. Left
@@ -1059,7 +1063,7 @@ void oppyPath(void){
 				rotateOppy(differentialAngle);
 				busy_delay(250);
 				globalAngle = 90;
-				pathSegment(STRAIGHT_LENGTH);
+				pathSegment(straightLength);
 				break;
 			}
 			// 4. Right
@@ -1068,7 +1072,7 @@ void oppyPath(void){
 				rotateOppy(differentialAngle);
 				busy_delay(250);
 				globalAngle = -90;
-				pathSegment(STRAIGHT_LENGTH);
+				pathSegment(straightLength);
 				break;
 			}
 			// 5. Diagonal left below
@@ -1077,7 +1081,7 @@ void oppyPath(void){
 				rotateOppy(differentialAngle);
 				busy_delay(250);
 				globalAngle = 135;
-				pathSegment(DIAGONAL_LENGTH);
+				pathSegment(diagonalLength);
 				break;
 			}
 			// 6. Below
@@ -1086,7 +1090,7 @@ void oppyPath(void){
 				rotateOppy(differentialAngle);
 				busy_delay(250);
 				globalAngle = 180;
-				pathSegment(STRAIGHT_LENGTH);
+				pathSegment(straightLength);
 				break;
 			}
 			// 7. Diagonal right below
@@ -1095,7 +1099,7 @@ void oppyPath(void){
 				rotateOppy(differentialAngle);
 				busy_delay(250);
 				globalAngle = -135;
-				pathSegment(DIAGONAL_LENGTH);
+				pathSegment(diagonalLength);
 				break;
 			}
 			default:{
@@ -1111,7 +1115,7 @@ void oppyPath(void){
 }
 
 
-/** Interrupción del USART2 */
+/** Interrupción del USART1 */
 void usart1Rx_Callback(void){
 	usartData = getRxData();
 	writeChar(&usartCmd, usartData);
@@ -1124,6 +1128,7 @@ void usart1Rx_Callback(void){
 		xSemaphoreGiveFromISR(xBinarySemaphore, NULL);
 	}
 	else if ((usartData == 'M')&&(oppyIndicator == 0)){
+		writeChar(&usartCmd, '\n');
 		usartData = 0;
 		xTaskNotifyFromISR(xHandleTask_Oppy_Movement, 0, eNoAction, NULL);
 	}
